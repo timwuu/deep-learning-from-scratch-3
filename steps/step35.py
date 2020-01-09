@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 from dezero import Variable
 from dezero.utils import plot_dot_graph
@@ -18,4 +19,4 @@ for i in range(iters):
 
 gx = x.grad
 gx.name = 'gx' + str(iters + 1)
-plot_dot_graph(gx, to_file='tanh.png')
+plot_dot_graph(gx, verbose=False, to_file='tanh.png')

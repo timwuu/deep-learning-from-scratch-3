@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import dezero
 import dezero.functions as F
 from dezero import optimizers
@@ -10,7 +11,7 @@ batch_size = 100
 
 train_set, test_set = dezero.datasets.get_mnist()
 train_loader = DatasetLoader(train_set, batch_size)
-model = MLP((784, 1000, 10))
+model = MLP((1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
 # model.load_weights('my_mlp.npz')

@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 from dezero import Variable
 from dezero import optimizers
@@ -14,7 +15,7 @@ lr = 0.2
 max_iter = 10000
 hidden_size = 10
 
-model = MLP((1, hidden_size, 1))
+model = MLP((hidden_size, 1))
 optimizer = optimizers.SGD(lr).setup(model)
 
 for i in range(max_iter):

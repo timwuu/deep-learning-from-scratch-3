@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import math
 import numpy as np
 import dezero
@@ -10,7 +11,7 @@ batch_size = 100
 hidden_size = 1000
 
 train_set, test_set = dezero.datasets.get_mnist()
-model = MLP((784, hidden_size, 10))
+model = MLP((hidden_size, 10))
 optimizer = optimizers.SGD().setup(model)
 
 data_size = len(train_set)

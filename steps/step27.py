@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 import math
 from dezero import Variable, Function
@@ -47,4 +48,4 @@ print(x.grad)
 
 x.name = 'x'
 y.name = 'y'
-plot_dot_graph(y, to_file='my_sin.png')
+plot_dot_graph(y, verbose=False, to_file='my_sin.png')

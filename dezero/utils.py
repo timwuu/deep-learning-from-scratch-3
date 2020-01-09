@@ -1,4 +1,5 @@
 import os
+import subprocess
 import urllib.request
 import numpy as np
 from dezero import as_variable
@@ -35,7 +36,7 @@ def _dot_func(f):
     return ret
 
 
-def get_dot_graph(outputs, verbose=False):
+def get_dot_graph(outputs, verbose=True):
     """Generates a graphviz DOT text of a computational graph.
 
     Build a graph of functions and variables backward-reachable from the
@@ -81,18 +82,28 @@ def get_dot_graph(outputs, verbose=False):
     return 'digraph g {\n' + txt + '}'
 
 
-def plot_dot_graph(outputs, verbose=False, to_file='graph.png'):
+def plot_dot_graph(outputs, verbose=True, to_file='graph.png'):
     dot_graph = get_dot_graph(outputs, verbose)
 
-    tmp_dir = os.path.join(os.path.expanduser('~'), '.dezero/tmp')
+    tmp_dir = os.path.join(os.path.expanduser('~'), '.dezero')
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
     graph_path = os.path.join(tmp_dir, 'tmp_graph.dot')
 
-    img_format = os.path.splitext(to_file)[1][1:]  # file extension(e.g. png)
     with open(graph_path, 'w') as f:
         f.write(dot_graph)
-    os.system('dot {} -T {} -o {}'.format(graph_path, img_format, to_file))
+
+    extension = os.path.splitext(to_file)[1][1:]  # Extension(e.g. png, pdf)
+    cmd = 'dot {} -T {} -o {}'.format(graph_path, extension, to_file)
+    subprocess.run(cmd, shell=True)
+
+    # Return the image as a Jupyter Image object, to be displayed in-line.
+    try:
+        from IPython import display
+        return display.Image(filename=to_file)
+    except:
+        pass
+
 
 
 # =============================================================================
@@ -366,6 +377,14 @@ def get_file(url, file_name=None):
 # =============================================================================
 # others
 # =============================================================================
+def get_deconv_outsize(size, k, s, p):
+    return s * (size - 1) + k - 2 * p
+
+
+def get_conv_outsize(input_size, kernel_size, stride, pad):
+    return (input_size + pad * 2 - kernel_size) // stride + 1
+
+
 def pair(x):
     if isinstance(x, int):
         return (x, x)

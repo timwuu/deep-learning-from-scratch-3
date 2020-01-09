@@ -8,7 +8,7 @@
 本書では「DeZero」というディープラーニングのフレームワークを作ります。DeZeroは本書オリジナルのフレームワークです。最小限のコードで、フレームワークのモダンな機能を実現します。本書では、この小さな——それでいて十分にパワフルな——フレームワークを、全部で60★のステップで完成させます。それによって、PyTorch、TensorFlow、Chainerなどの現代のフレームワークに通じる深い知識を養います。
 
 <p>
-<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/dezero_logo.png" width="300px" </p>
+<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/dezero_logo.png" width="400px" </p>
 
 
 <p>
@@ -49,18 +49,17 @@
 ## 実行方法
 
 本書で説明するPythonファイルは、主に[steps](/steps)ファルダにあります。
-実行するためには、本リポジトリの一番上の階層からPythonコマンドを実行します。
-
+実行するためには、下記のとおりPythonコマンドを実行します。
 
 ```
-# 👍(Good)
 $ python steps/step01.py
-$ python steps/step31.py
+$ python steps/step02.py
 
-# ❌(NG)
 $ cd steps
 $ python step31.py
 ```
+
+上のように、どのディレクトリからでも実行することができます。
 
 ## デモ
 

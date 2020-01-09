@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import time
 import dezero
 import dezero.functions as F
@@ -10,12 +11,13 @@ batch_size = 100
 
 train_set, test_set = dezero.datasets.get_mnist()
 train_loader = DatasetLoader(train_set, batch_size)
-model = MLP((784, 1000, 10))
+model = MLP((1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
 # GPU mode
-train_loader.to_gpu()
-model.to_gpu()
+if dezero.cuda.gpu_enable:
+    train_loader.to_gpu()
+    model.to_gpu()
 
 for epoch in range(max_epoch):
     start = time.time()

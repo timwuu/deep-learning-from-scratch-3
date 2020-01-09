@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 np.random.seed(0)
 from dezero import Variable, as_variable
@@ -12,9 +13,9 @@ def softmax1d(x):
     return y / sum_y
 
 
-model = MLP((2, 10, 3))
+model = MLP((10, 3))
 
-x = Variable(np.array([0.2, -0.4]))
+x = Variable(np.array([[0.2, -0.4]]))
 y = model(x)
 p = softmax1d(y)
 print(y)

@@ -1,3 +1,4 @@
+from operator import itemgetter
 import math
 pil_available = True
 try:
@@ -17,15 +18,32 @@ class Dataset:
         raise NotImplementedError
 
 
+class TupleDataset:
+    """Dataset of tuples from multiple equal-length datasets.
+    """
+    def __init__(self, *datasets):
+        self._datasets = datasets
+        self._length = len(datasets[0])
+
+    def __getitem__(self, index):
+        batches = [dataset[index] for dataset in self._datasets]
+        if isinstance(index, slice):
+            L = len(batches[0])
+            return [tuple([batch[i] for batch in batches]) for i in range(L)]
+        else:
+            return tuple(batches)
+
+    def __len__(self):
+        return self._length
+
+
 class DatasetLoader:
-    def __init__(self, dataset, batch_size, shuffle=True, preprocess=None,
-                 gpu=False):
+    def __init__(self, dataset, batch_size, shuffle=True, gpu=False):
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.data_size = len(dataset)
         self.max_iter = math.ceil(self.data_size / batch_size)
-        self.preprocess = preprocess
         self.gpu = gpu
 
         self.reset()
@@ -38,21 +56,22 @@ class DatasetLoader:
     def __iter__(self):
         return self
 
+    def _get_batch(self):
+        i = self.iteration % self.max_iter
+        start_idx = i * self.batch_size
+        end_idx = (i + 1) * self.batch_size
+        batch = self.dataset[start_idx:end_idx]
+        return batch
+
     def __next__(self):
         if self.iteration >= self.max_iter:
             self.reset()
             raise StopIteration
 
-        i = self.iteration % self.max_iter
-        start_idx = i * self.batch_size
-        end_idx = (i + 1) * self.batch_size
-        batch = self.dataset[start_idx:end_idx]
+        batch = self._get_batch()
 
         xp = cuda.cupy if self.gpu else np
-        if self.preprocess is None:
-            x = xp.array([example[0] for example in batch])
-        else:
-            x = xp.array([self.preprocess(example[0]) for example in batch])
+        x = xp.array([example[0] for example in batch])
         t = xp.array([example[1] for example in batch])
 
         self.iteration += 1
@@ -69,6 +88,22 @@ class DatasetLoader:
         self.gpu = True
 
 
+class SeqDataLoader(DatasetLoader):
+    def __init__(self, dataset, batch_size, gpu=False):
+        super().__init__(dataset=dataset, batch_size=batch_size, shuffle=False,
+                         gpu=gpu)
+
+    def _get_batch(self):
+        jump = self.data_size // self.batch_size
+        offsets = [(i * jump + self.iteration) % self.data_size for i in
+                   range(self.batch_size)]
+        batch = itemgetter(*offsets)(self.dataset)
+        return batch
+
+
+# =============================================================================
+# Preprocess function
+# =============================================================================
 def preprocess_vgg(image, size=(224, 224), dtype=np.float32):
     """VGGで使用する画像に対して前処理を施しndarrayへと変換する
     VGGのpre-trainedモデルでは、下記の前処理を行う
